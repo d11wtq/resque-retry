@@ -273,6 +273,9 @@ module Resque
         retry_key = redis_retry_key(*args)
         Resque.redis.setnx(retry_key, -1)             # default to -1 if not set.
         @retry_attempt = Resque.redis.incr(retry_key) # increment by 1.
+
+        # don't allow args to be changed otherwise retry key can't be deleted in after_perform_retry
+        args.freeze
       end
 
       # Resque after_perform hook
